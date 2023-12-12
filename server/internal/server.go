@@ -28,16 +28,6 @@ func init() {
 		Name:        "Character",
 		Description: "A StarWars character",
 		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type:        graphql.NewNonNull(graphql.String),
-				Description: "The id of the character.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if character, ok := p.Source.(Character); ok {
-						return character.ID, nil
-					}
-					return nil, nil
-				},
-			},
 			"name": &graphql.Field{
 				Type:        graphql.String,
 				Description: "The name of the character.",

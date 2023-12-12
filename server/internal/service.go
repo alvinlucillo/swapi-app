@@ -18,18 +18,39 @@ func NewService(swapiClient SWAPIQueryer) CharacterServiceImpl {
 }
 
 func (c CharacterServiceImpl) GetCharacters(name string) ([]Character, error) {
-	people, err := c.swapiClient.QueryPeople(name)
+	peopleResult, err := c.swapiClient.QueryPeople(name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query people: %w", err)
 	}
 
 	var characters []Character
-	for _, person := range people {
-		characters = append(characters, Character{
+	for _, person := range peopleResult {
+		character := Character{
 			ID:           person.URL,
 			Name:         person.Name,
 			IsBookmarked: false,
-		})
+		}
+
+		for _, film := range person.Films {
+			filmResult, err := c.swapiClient.QueryFilm(film)
+			if err != nil {
+				return nil, fmt.Errorf("failed to query film: %w", err)
+			}
+
+			character.Films = append(character.Films, filmResult.Title)
+		}
+
+		for _, vehicle := range person.Vehicles {
+			vehicleResult, err := c.swapiClient.QueryVehicle(vehicle)
+			if err != nil {
+				return nil, fmt.Errorf("failed to query vehicle: %w", err)
+			}
+
+			character.CarModels = append(character.CarModels, vehicleResult.Model)
+		}
+
+		characters = append(characters, character)
+
 	}
 
 	return characters, nil

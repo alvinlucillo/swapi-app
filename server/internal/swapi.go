@@ -15,7 +15,7 @@ type SWAPIClient struct {
 // SWAPIQueryer is an interface for querying the Star Wars API
 type SWAPIQueryer interface {
 	QueryPeople(name string) ([]PeopleResult, error)
-	QueryFilm(filmID string) ([]FilmResult, error)
+	QueryFilm(filmID string) (FilmResult, error)
 	QueryVehicle(vehicleID string) (VehicleResult, error)
 }
 
@@ -44,12 +44,8 @@ type PeopleResponse struct {
 	Results []PeopleResult `json:"results"`
 }
 
-type VehicleResponse struct {
-	Result []VehicleResult `json:"results"`
-}
-
 type FilmResponse struct {
-	Result []FilmResult `json:"results"`
+	Result FilmResult `json:"results"`
 }
 
 func (s SWAPIClient) QueryPeople(name string) ([]PeopleResult, error) {
@@ -75,33 +71,30 @@ func (s SWAPIClient) QueryPeople(name string) ([]PeopleResult, error) {
 	return response.Results, nil
 }
 
-func (s SWAPIClient) QueryFilm(filmID string) ([]FilmResult, error) {
-	url := s.baseURL + "/films/" + filmID
+func (s SWAPIClient) QueryFilm(sourceUrl string) (FilmResult, error) {
+	var response FilmResult
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodGet, sourceUrl, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return response, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	resp, err := s.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return response, fmt.Errorf("failed to send request: %w", err)
 	}
 	defer resp.Body.Close()
 
-	var response FilmResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
+		return response, fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	return response.Result, nil
+	return response, nil
 }
 
-func (s SWAPIClient) QueryVehicle(vehicleID string) (VehicleResult, error) {
-	url := s.baseURL + "/vehicles/" + vehicleID
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+func (s SWAPIClient) QueryVehicle(sourceUrl string) (VehicleResult, error) {
+	req, err := http.NewRequest(http.MethodGet, sourceUrl, nil)
 	if err != nil {
 		return VehicleResult{}, fmt.Errorf("failed to create request: %w", err)
 	}

@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-
 	var (
 		prettyFlag   = flag.Bool("pretty", true, "Enable/disable pretty formatting")
 		graphiQLFlag = flag.Bool("graphiql", true, "Enable/disable GraphiQL")
@@ -25,9 +24,7 @@ func main() {
 	flag.Parse()
 
 	swapiApiClient := internal.NewSWAPIClient(&http.Client{}, "https://swapi.dev/api")
-
 	svc := internal.NewService(swapiApiClient)
-
 	srv := internal.NewServer(internal.ServerConfig{
 		GraphiQL: *graphiQLFlag,
 		Port:     *portFlag,
