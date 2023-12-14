@@ -15,14 +15,19 @@ type CharactersResult struct {
 	SearchID   string
 }
 
-// initializes characterType when the package is imported
-func init() {
-
-}
-
-// . NewHandler returns a new graphql handler
+// NewHandler returns a new graphql handler
 func NewHandler(cfg HandlerConfig, svc CharacterService) *handler.Handler {
-
+	// Defines the properties of a character
+	// For example, R2-D2 has the following properties:
+	// {
+	//   "name": "R2-D2",
+	//   "films": [
+	//     "https://swapi.dev/api/films/1/",
+	//   ],
+	//   "vehicleModels": [
+	//     "https://swapi.dev/api/vehicles/8/"
+	//   ]
+	// }
 	characterType := graphql.NewObject(graphql.ObjectConfig{
 		Name:        "Character",
 		Description: "A StarWars character",
@@ -60,6 +65,7 @@ func NewHandler(cfg HandlerConfig, svc CharacterService) *handler.Handler {
 		},
 	})
 
+	// Defines the list of characters that are returned from a search with its search ID
 	charactersResultType := graphql.NewObject(
 		graphql.ObjectConfig{
 			Name: "CharactersResult",
@@ -74,6 +80,7 @@ func NewHandler(cfg HandlerConfig, svc CharacterService) *handler.Handler {
 		},
 	)
 
+	// Defines the properties of a saved search, used when querying for saved searches
 	searchQueryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Search",
 		Fields: graphql.Fields{
@@ -86,6 +93,7 @@ func NewHandler(cfg HandlerConfig, svc CharacterService) *handler.Handler {
 		},
 	})
 
+	// Defines the Queries that can be made
 	characterQueryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "CharacterQuery",
 		Fields: graphql.Fields{
@@ -138,6 +146,7 @@ func NewHandler(cfg HandlerConfig, svc CharacterService) *handler.Handler {
 		},
 	})
 
+	// Defines the Mutations that can be made
 	characterMutationType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "CharacterMutation",
 		Fields: graphql.Fields{
@@ -163,6 +172,7 @@ func NewHandler(cfg HandlerConfig, svc CharacterService) *handler.Handler {
 		},
 	})
 
+	// Combines the Queries and Mutations into a Schema
 	schema, _ := graphql.NewSchema(graphql.SchemaConfig{
 		Query:    characterQueryType,
 		Mutation: characterMutationType,

@@ -22,6 +22,7 @@ type Config struct {
 	Port     string `env:"PORT" envDefault:"8080"`
 }
 
+// Entry point of the application
 func main() {
 	// Load environment variables into config
 	cfg, err := NewConfig()

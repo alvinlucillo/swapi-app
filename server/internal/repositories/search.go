@@ -21,9 +21,9 @@ type SearchRepositoryImpl struct {
 	db *mongo.Database
 }
 
-func NewSearchRepository(db *mongo.Database) (*SearchRepositoryImpl, error) {
+func NewSearchRepository(cfg Config) (*SearchRepositoryImpl, error) {
 
-	collection := db.Collection(SearchCollection)
+	collection := cfg.DB.Collection(SearchCollection)
 
 	// Define the index model
 	// Does not automatically expire the documents; expiration is based on the value of the expiresAt field
@@ -59,7 +59,7 @@ func NewSearchRepository(db *mongo.Database) (*SearchRepositoryImpl, error) {
 	}
 
 	return &SearchRepositoryImpl{
-		db: db,
+		db: cfg.DB,
 	}, nil
 }
 

@@ -22,15 +22,15 @@ type CharacterRepositoryImpl struct {
 }
 
 // NewCharacterRepository - Creates a new CharacterRepositoryImpl
-func NewCharacterRepository(db *mongo.Database) (*CharacterRepositoryImpl, error) {
+func NewCharacterRepository(cfg Config) (*CharacterRepositoryImpl, error) {
 
-	collection := db.Collection(CharacterCollection)
+	collection := cfg.DB.Collection(CharacterCollection)
 
 	// Define the index model
 	// Sets TTL
 	indexModel := mongo.IndexModel{
-		Keys:    bson.D{{Key: "createdAt", Value: 1}},        // Index key
-		Options: options.Index().SetExpireAfterSeconds(3600), // TTL value - 1 hour
+		Keys:    bson.D{{Key: "createdAt", Value: 1}},                   // Index key
+		Options: options.Index().SetExpireAfterSeconds(cfg.DocumentTTL), // TTL value
 	}
 
 	cursor, err := collection.Indexes().List(context.TODO())
@@ -77,7 +77,7 @@ func NewCharacterRepository(db *mongo.Database) (*CharacterRepositoryImpl, error
 	}
 
 	return &CharacterRepositoryImpl{
-		db: db,
+		db: cfg.DB,
 	}, nil
 }
 

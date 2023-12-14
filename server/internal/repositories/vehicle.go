@@ -21,15 +21,15 @@ type VehicleRepositoryImpl struct {
 	db *mongo.Database
 }
 
-func NewVehicleRepository(db *mongo.Database) (*VehicleRepositoryImpl, error) {
+func NewVehicleRepository(cfg Config) (*VehicleRepositoryImpl, error) {
 
-	collection := db.Collection(VehicleCollection)
+	collection := cfg.DB.Collection(VehicleCollection)
 
 	// Define the index model
 	// Sets TTL
 	indexModel := mongo.IndexModel{
-		Keys:    bson.D{{Key: "createdAt", Value: 1}},        // Index key
-		Options: options.Index().SetExpireAfterSeconds(3600), // TTL value - 1 hour
+		Keys:    bson.D{{Key: "createdAt", Value: 1}},                   // Index key
+		Options: options.Index().SetExpireAfterSeconds(cfg.DocumentTTL), // TTL value
 	}
 
 	cursor, err := collection.Indexes().List(context.TODO())
@@ -76,7 +76,7 @@ func NewVehicleRepository(db *mongo.Database) (*VehicleRepositoryImpl, error) {
 	}
 
 	return &VehicleRepositoryImpl{
-		db: db,
+		db: cfg.DB,
 	}, nil
 }
 

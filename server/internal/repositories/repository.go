@@ -25,25 +25,25 @@ type Config struct {
 }
 
 func NewRepository(cfg Config) (*Repository, error) {
-	vehicleRepository, err := NewVehicleRepository(cfg.DB)
+	vehicleRepository, err := NewVehicleRepository(cfg)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return nil, err
 	}
 
-	filmRepository, err := NewFilmRepository(cfg.DB)
+	filmRepository, err := NewFilmRepository(cfg)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return nil, err
 	}
 
-	searchRepository, err := NewSearchRepository(cfg.DB)
+	searchRepository, err := NewSearchRepository(cfg)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return nil, err
 	}
 
-	characterRepository, err := NewCharacterRepository(cfg.DB)
+	characterRepository, err := NewCharacterRepository(cfg)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return nil, err
