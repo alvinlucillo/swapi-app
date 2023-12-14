@@ -1,4 +1,4 @@
-# Star Wars Trivia UI Project
+# Star Wars Trivia App
 
 As a Star Wars super fan that loves trivia, the goal is to develop a UI that allows users to list the film(s) and vehicle model(s) for Star Wars characters, aiding in preparation for trivia nights.
 
