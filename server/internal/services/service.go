@@ -14,6 +14,7 @@ import (
 type Config struct {
 	DBName             string `env:"DB_NAME" envDefault:"swapiapp"`
 	DBConnectionString string `env:"DB_CONNECTION_STRING" envDefault:"mongodb://localhost:27017/"`
+	DBDocumentTTL      int32  `env:"DB_DOCUMENT_TTL" envDefault:"43200"`
 }
 
 func NewConfig() (*Config, error) {
@@ -50,7 +51,7 @@ func NewService(swapiClient SWAPIQueryer) (*CharacterServiceImpl, error) {
 		return nil, err
 	}
 
-	repo, err := repositories.NewRepository(db.Database)
+	repo, err := repositories.NewRepository(repositories.Config{DocumentTTL: cfg.DBDocumentTTL, DB: db.Database})
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return nil, err

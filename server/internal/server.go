@@ -5,6 +5,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
+	"github.com/rs/cors"
 )
 
 type Server struct {
@@ -18,11 +19,16 @@ type ServerConfig struct {
 
 // NewServer returns a new HTTP server
 func NewServer(cfg ServerConfig, h *handler.Handler) *http.Server {
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // Allow all origins
+		AllowCredentials: true,
+		AllowedMethods:   []string{"OPTIONS", "POST"},
+	})
 
 	// Create a new HTTP server
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,
-		Handler: h,
+		Handler: c.Handler(h),
 	}
 
 	return srv

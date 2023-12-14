@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 // SWAPI is a client for the Star Wars API
@@ -50,7 +51,8 @@ type FilmResponse struct {
 
 // QueryPeople - queries the Star Wars API for people with the given name
 func (s SWAPIClient) QueryPeople(name string) ([]PeopleResult, error) {
-	url := s.baseURL + "/people/?search=" + name
+	escapedName := url.QueryEscape(name)
+	url := s.baseURL + "/people/?search=" + escapedName
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

@@ -3,9 +3,13 @@ package repositories
 import (
 	"fmt"
 
-	"go.mongodb.org/mongo-driver/mongo"
-
 	"alvinlucillo/swapi-app/internal/models"
+
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+var (
+	DocumentTTL int32
 )
 
 type Repository struct {
@@ -15,26 +19,31 @@ type Repository struct {
 	CharacterRepository CharacterRepository
 }
 
-func NewRepository(db *mongo.Database) (*Repository, error) {
-	vehicleRepository, err := NewVehicleRepository(db)
+type Config struct {
+	DocumentTTL int32
+	DB          *mongo.Database
+}
+
+func NewRepository(cfg Config) (*Repository, error) {
+	vehicleRepository, err := NewVehicleRepository(cfg.DB)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return nil, err
 	}
 
-	filmRepository, err := NewFilmRepository(db)
+	filmRepository, err := NewFilmRepository(cfg.DB)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return nil, err
 	}
 
-	searchRepository, err := NewSearchRepository(db)
+	searchRepository, err := NewSearchRepository(cfg.DB)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return nil, err
 	}
 
-	characterRepository, err := NewCharacterRepository(db)
+	characterRepository, err := NewCharacterRepository(cfg.DB)
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return nil, err
