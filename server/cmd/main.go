@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,29 +11,43 @@ import (
 	"time"
 
 	"alvinlucillo/swapi-app/internal"
+	"alvinlucillo/swapi-app/internal/services"
+
+	"github.com/caarlos0/env/v10"
 )
 
+type Config struct {
+	Pretty   bool   `env:"PRETTY" envDefault:"true"`
+	GraphiQL bool   `env:"GRAPHIQL" envDefault:"true"`
+	Port     string `env:"PORT" envDefault:"8080"`
+}
+
 func main() {
-	var (
-		prettyFlag   = flag.Bool("pretty", true, "Enable/disable pretty formatting")
-		graphiQLFlag = flag.Bool("graphiql", true, "Enable/disable GraphiQL")
-		portFlag     = flag.String("port", "8080", "Port number for the server")
-	)
+	// Load environment variables into config
+	cfg, err := NewConfig()
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+		return
+	}
 
-	flag.Parse()
-
-	swapiApiClient := internal.NewSWAPIClient(&http.Client{}, "https://swapi.dev/api")
-	svc := internal.NewService(swapiApiClient)
+	// Create a new SWAPI client
+	swapiApiClient := services.NewSWAPIClient(&http.Client{}, "https://swapi.dev/api")
+	// Create a new service
+	svc, err := services.NewService(swapiApiClient)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+		return
+	}
+	// Create a new handler
+	h := services.NewHandler(services.HandlerConfig{Pretty: cfg.Pretty, GraphiQL: cfg.GraphiQL}, svc)
 	srv := internal.NewServer(internal.ServerConfig{
-		GraphiQL: *graphiQLFlag,
-		Port:     *portFlag,
-		Pretty:   *prettyFlag,
-	}, svc)
+		Port: cfg.Port,
+	}, h)
 
 	// Start the server in a separate goroutine
 	go func() {
 		fmt.Println("Server is running on http://localhost:8080/graphql")
-		if err := srv.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Failed to start server: %v", err)
 		}
 	}()
@@ -50,9 +63,17 @@ func main() {
 	defer cancel()
 
 	// Shutdown the server gracefully
-	if err := srv.Server.Shutdown(ctx); err != nil {
+	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatalf("Failed to shutdown server: %v", err)
 	}
 
 	fmt.Println("Server gracefully stopped")
+}
+
+func NewConfig() (*Config, error) {
+	cfg := &Config{}
+	if err := env.Parse(cfg); err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }

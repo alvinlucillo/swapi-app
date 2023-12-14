@@ -1,4 +1,4 @@
-package internal
+package services
 
 import (
 	"encoding/json"
@@ -48,6 +48,7 @@ type FilmResponse struct {
 	Result FilmResult `json:"results"`
 }
 
+// QueryPeople - queries the Star Wars API for people with the given name
 func (s SWAPIClient) QueryPeople(name string) ([]PeopleResult, error) {
 	url := s.baseURL + "/people/?search=" + name
 
@@ -71,6 +72,7 @@ func (s SWAPIClient) QueryPeople(name string) ([]PeopleResult, error) {
 	return response.Results, nil
 }
 
+// QueryFilm - queries the Star Wars API for a film with the given ID
 func (s SWAPIClient) QueryFilm(sourceUrl string) (FilmResult, error) {
 	var response FilmResult
 
@@ -93,6 +95,7 @@ func (s SWAPIClient) QueryFilm(sourceUrl string) (FilmResult, error) {
 	return response, nil
 }
 
+// QueryVehicle - queries the Star Wars API for a vehicle with the given ID
 func (s SWAPIClient) QueryVehicle(sourceUrl string) (VehicleResult, error) {
 	req, err := http.NewRequest(http.MethodGet, sourceUrl, nil)
 	if err != nil {
